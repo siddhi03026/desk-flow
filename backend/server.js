@@ -14,7 +14,8 @@ const app = express();
 app.use(express.json());
 
 // Enable CORS
-const allowedOrigins = [process.env.FRONTEND_URL].filter(Boolean);
+const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:5174']
+  .filter(Boolean);
 const corsOptions = {
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
