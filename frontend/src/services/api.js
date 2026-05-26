@@ -1,13 +1,27 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const api = axios.create({
   baseURL: `${API_URL}/tickets`,
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 15000,
 });
+
+// Response interceptor for better error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.code === 'ECONNABORTED') {
+      error.message = 'Request timed out. The server may be waking up — please retry.';
+    } else if (!error.response) {
+      error.message = 'Cannot reach the server. Please check your connection.';
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const getTickets = async (filters = {}) => {
   const params = new URLSearchParams();
@@ -37,4 +51,13 @@ export const updateTicketStatus = async (id, status) => {
 export const deleteTicket = async (id) => {
   const response = await api.delete(`/${id}`);
   return response.data;
+};
+
+export const checkHealth = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/api/health`, { timeout: 5000 });
+    return response.data.status === 'ok';
+  } catch {
+    return false;
+  }
 };
