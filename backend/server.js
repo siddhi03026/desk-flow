@@ -18,12 +18,17 @@ const allowedOrigins = [
   'http://localhost:3000'
 ].filter(Boolean);
 
+const isVercelOrigin = (origin) => typeof origin === 'string' && /https:\/\/.*\.vercel\.app$/.test(origin);
+
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+    if (!origin) {
       return callback(null, true);
     }
-    return callback(new Error('Not allowed by CORS'));
+    if (allowedOrigins.includes(origin) || isVercelOrigin(origin)) {
+      return callback(null, true);
+    }
+    return callback(null, true);
   },
   credentials: true,
 };
@@ -38,6 +43,10 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     timestamp: new Date().toISOString()
   });
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
 });
 
 app.get('/api/health', (req, res) => {

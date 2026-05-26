@@ -1,8 +1,10 @@
 import axios from 'axios';
 
+const normalizeUrl = (url) => url.replace(/\/+$/, '');
+
 const getApiUrl = () => {
   if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
+    return normalizeUrl(import.meta.env.VITE_API_URL);
   }
   // Fallback to Render URL in production
   if (typeof window !== 'undefined' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')) {
@@ -66,7 +68,7 @@ export const deleteTicket = async (id) => {
 
 export const checkHealth = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/health`, { timeout: 5000 });
+    const response = await axios.get(`${API_URL}/health`, { timeout: 5000 });
     return response.data.status === 'ok';
   } catch {
     return false;
