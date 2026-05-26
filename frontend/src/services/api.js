@@ -1,6 +1,17 @@
 import axios from 'axios';
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const getApiUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  // Fallback to Render URL in production
+  if (typeof window !== 'undefined' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')) {
+    return 'https://desk-flow-32bo.onrender.com';
+  }
+  return 'http://localhost:5000';
+};
+
+export const API_URL = getApiUrl();
 
 const api = axios.create({
   baseURL: `${API_URL}/tickets`,
